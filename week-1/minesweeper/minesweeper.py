@@ -1,6 +1,6 @@
 import itertools
 import random
-
+import copy
 
 class Minesweeper():
     """
@@ -118,14 +118,20 @@ class Sentence():
         Updates internal knowledge representation given the fact that
         a cell is known to be a mine.
         """
-        raise NotImplementedError
+        self.mines.add(cell)
+        
+        for sentence in self.knowledge:
+            sentence.mark_mine(cell)
 
     def mark_safe(self, cell):
         """
         Updates internal knowledge representation given the fact that
         a cell is known to be safe.
         """
-        raise NotImplementedError
+        if cell in self.cells:
+            self.cells.remove(cell)
+        else:
+            pass
 
 
 class MinesweeperAI():
@@ -154,9 +160,11 @@ class MinesweeperAI():
         Marks a cell as a mine, and updates all knowledge
         to mark that cell as a mine as well.
         """
-        self.mines.add(cell)
+        self.safes.add(cell)
+
         for sentence in self.knowledge:
-            sentence.mark_mine(cell)
+            if cell in sentence.cells:
+                sentence.mark_safe(cell) 
 
     def mark_safe(self, cell):
         """
@@ -196,63 +204,63 @@ class MinesweeperAI():
 
         self.update_knowledge_based_on_new_info()
 
-def return_close_cells(self, cell):
-    """
-    Returns a set of cells that are directly adjacent to the given cell (above, below, left, right, and diagonal).
-    """
-    x, y = cell
-    return {(x + dx, y + dy) for dx in range(-1, 2) for dy in range(-1, 2) if (dx != 0 or dy != 0) and 0 <= x + dx < self.height and 0 <= y + dy < self.width}
+    def return_close_cells(self, cell):
+        """
+        Returns a set of cells that are directly adjacent to the given cell (above, below, left, right, and diagonal).
+        """
+        x, y = cell
+        return {(x + dx, y + dy) for dx in range(-1, 2) for dy in range(-1, 2) if (dx != 0 or dy != 0) and 0 <= x + dx < self.height and 0 <= y + dy < self.width}
 
 
-def update_knowledge_based_on_new_info(self):
-    """
-    Checks and updates the knowledge base based on the new information.
-    """
-    new_knowledge = []
-    for sentence in self.knowledge:
-        new_cells = sentence.cells - self.safes
-        if new_cells != sentence.cells:
-            sentence.cells = new_cells
-            sentence.count -= len(sentence.cells - new_cells)
+    def update_knowledge_based_on_new_info(self):
+        """
+        Checks and updates the knowledge base based on the new information.
+        """
+        new_knowledge = []
+        for sentence in self.knowledge:
+            new_cells = sentence.cells - self.safes
+            if new_cells != sentence.cells:
+                sentence.cells = new_cells
+                sentence.count -= len(sentence.cells - new_cells)
 
-        if sentence.count == 0:
-            self.safes.update(sentence.cells)
-        elif len(sentence.cells) == sentence.count:
-            self.mines.update(sentence.cells)
-        else:
-            new_knowledge.append(sentence)
+            if sentence.count == 0:
+                self.safes.update(sentence.cells)
+            elif len(sentence.cells) == sentence.count:
+                self.mines.update(sentence.cells)
+            else:
+                new_knowledge.append(sentence)
 
-    self.knowledge = new_knowledge
+        self.knowledge = new_knowledge
 
-def make_safe_move(self):
-    """
-    Returns a safe cell to choose on the Minesweeper board.
-    The move must be known to be safe, and not already a move
-    that has been made.
+    def make_safe_move(self):
+        """
+        Returns a safe cell to choose on the Minesweeper board.
+        The move must be known to be safe, and not already a move
+        that has been made.
 
-    This function may use the knowledge in self.mines, self.safes
-    and self.moves_made, but should not modify any of those values.
-    """
-    for i in self.safes - self.moves_made:
-        return i
+        This function may use the knowledge in self.mines, self.safes
+        and self.moves_made, but should not modify any of those values.
+        """
+        for i in self.safes - self.moves_made:
+            return i
 
-    return None
+        return None
 
-def make_random_move(self):
-    """
-    Returns a move to make on the Minesweeper board.
-    Should choose randomly among cells that:
-    1) have not already been chosen, and
-    2) are not known to be mines
-    """
-    max_moves = self.width * self.height
-    occupied_positions = self.moves_made | self.mines
+    def make_random_move(self):
+        """
+        Returns a move to make on the Minesweeper board.
+        Should choose randomly among cells that:
+        1) have not already been chosen, and
+        2) are not known to be mines
+        """
+        max_moves = self.width * self.height
+        occupied_positions = self.moves_made | self.mines
 
-    all_positions = {(row, col) for row in range(self.height) for col in range(self.width)}
+        all_positions = {(row, col) for row in range(self.height) for col in range(self.width)}
 
-    available_positions = list(all_positions - occupied_positions)
+        available_positions = list(all_positions - occupied_positions)
 
-    if available_positions:
-        return random.choice(available_positions)
+        if available_positions:
+            return random.choice(available_positions)
 
-    return None
+        return None
