@@ -139,7 +139,41 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         * everyone in set `have_trait` has the trait, and
         * everyone not in set` have_trait` does not have the trait.
     """
-    raise NotImplementedError
+    probability = 1
+
+    for person in people:
+        gene_number = 1 if person in one_gene else 2 if person in two_genes else 0
+        trait = person in have_trait
+
+        gene_prob = PROBS['gene'][gene_number]
+        trait_prob = PROBS['trait'][gene_number][trait]
+
+        if people[person]['mother'] is None:
+            probability *= gene_prob * trait_prob
+        else:
+            mother = people[person]['mother']
+            father = people[person]['father']
+            parent_probabilities = {}
+
+            for parent in [mother, father]:
+                if parent in one_gene:
+                    parent_probabilities[parent] = 0.5
+                elif parent in two_genes:
+                    parent_probabilities[parent] = 1 - PROBS['mutation']
+                else:
+                    parent_probabilities[parent] = PROBS['mutation']
+
+            if gene_number == 0:
+                probability *= (1 - parent_probabilities[mother]) * (1 - parent_probabilities[father])
+            elif gene_number == 1:
+                probability *= ((1 - parent_probabilities[mother]) * parent_probabilities[father] +
+                            parent_probabilities[mother] * (1 - parent_probabilities[father]))
+            else:
+                probability *= parent_probabilities[mother] * parent_probabilities[father]
+
+            probability *= trait_prob
+
+    return probability
 
 
 def update(probabilities, one_gene, two_genes, have_trait, p):
@@ -174,7 +208,6 @@ def normalize(probabilities):
             total = sum(values.values())
             normalized[person][typ] = {category: val / total for category, val in values.items()}
     return normalized
-
 
 if __name__ == "__main__":
     main()
