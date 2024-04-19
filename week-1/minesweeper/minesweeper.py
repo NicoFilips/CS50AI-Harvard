@@ -224,35 +224,35 @@ def update_knowledge_based_on_new_info(self):
 
     self.knowledge = new_knowledge
 
-    def make_safe_move(self):
-        """
-        Returns a safe cell to choose on the Minesweeper board.
-        The move must be known to be safe, and not already a move
-        that has been made.
+def make_safe_move(self):
+    """
+    Returns a safe cell to choose on the Minesweeper board.
+    The move must be known to be safe, and not already a move
+    that has been made.
 
-        This function may use the knowledge in self.mines, self.safes
-        and self.moves_made, but should not modify any of those values.
-        """
-        for i in self.safes - self.moves_made:
-            return i
+    This function may use the knowledge in self.mines, self.safes
+    and self.moves_made, but should not modify any of those values.
+    """
+    for i in self.safes - self.moves_made:
+        return i
 
-        return None
+    return None
 
-    def make_random_move(self):
-        """
-        Returns a move to make on the Minesweeper board.
-        Should choose randomly among cells that:
-            1) have not already been chosen, and
-            2) are not known to be mines
-        """
-        max_moves = self.width * self.height
-        occupied_positions = self.moves_made | self.mines
+def make_random_move(self):
+    """
+    Returns a move to make on the Minesweeper board.
+    Should choose randomly among cells that:
+    1) have not already been chosen, and
+    2) are not known to be mines
+    """
+    max_moves = self.width * self.height
+    occupied_positions = self.moves_made | self.mines
 
-        all_positions = {(row, col) for row in range(self.height) for col in range(self.width)}
+    all_positions = {(row, col) for row in range(self.height) for col in range(self.width)}
 
-        available_positions = list(all_positions - occupied_positions)
+    available_positions = list(all_positions - occupied_positions)
 
-        if available_positions:
-            return random.choice(available_positions)
+    if available_positions:
+        return random.choice(available_positions)
 
-        return None
+    return None
