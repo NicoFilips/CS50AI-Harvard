@@ -1,0 +1,9 @@
+*.zip
+*.pyc
+
+__pycache__/
+.venv/
+venv/
+.idea/
+
+*/degrees/large/
