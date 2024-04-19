@@ -70,7 +70,26 @@ def winner(board):
     """
     Returns the winner of the game, if there is one.
     """
-    raise NotImplementedError
+    # Define possible players
+    X, O = 'X', 'O'
+    for player in (X, O):
+        # Check horizontal rows for a win
+        for row in board:
+            if row == [player] * 3:
+                return player
+
+        # Check vertical columns for a win
+        for col in range(3):
+            if [board[row][col] for row in range(3)] == [player] * 3:
+                return player
+
+        # Check diagonals for a win
+        if [board[i][i] for i in range(3)] == [player] * 3:
+            return player
+        if [board[i][2-i] for i in range(3)] == [player] * 3:
+            return player
+
+    return None
 
 
 def terminal(board):
