@@ -22,16 +22,15 @@ def player(board):
     """
     Returns player who has the next turn on a board.
     """
-    X = 'X'  # Assuming 'X' and 'O' are not defined elsewhere
+    X = 'X'
     O = 'O'
-    x_count = 0  # Number of 'X's on the board
-    o_count = 0  # Number of 'O's on the board
+    x_count = 0
+    o_count = 0
 
     for row in board:
         x_count += row.count(X)
         o_count += row.count(O)
 
-    # 'X' plays next if there are fewer or equal 'X's than 'O's on the board
     return X if x_count <= o_count else O
 
 
@@ -43,7 +42,7 @@ def actions(board):
 
     for i, row in enumerate(board):
         for j, cell in enumerate(row):
-            if cell is None:  # Explicitly compare to None for clarity
+            if cell is None:
                 possible_moves.add((i, j))
 
     return possible_moves
@@ -70,20 +69,16 @@ def winner(board):
     """
     Returns the winner of the game, if there is one.
     """
-    # Define possible players
     X, O = 'X', 'O'
     for player in (X, O):
-        # Check horizontal rows for a win
         for row in board:
             if row == [player] * 3:
                 return player
 
-        # Check vertical columns for a win
         for col in range(3):
             if [board[row][col] for row in range(3)] == [player] * 3:
                 return player
 
-        # Check diagonals for a win
         if [board[i][i] for i in range(3)] == [player] * 3:
             return player
         if [board[i][2-i] for i in range(3)] == [player] * 3:
@@ -96,7 +91,14 @@ def terminal(board):
     """
     Returns True if game is over, False otherwise.
     """
-    raise NotImplementedError
+    if winner(board) is not None:
+        return True
+
+    for row in board:
+        if None in row:
+            return False
+
+    return True
 
 
 def utility(board):
