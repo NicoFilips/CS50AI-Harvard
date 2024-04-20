@@ -1,6 +1,8 @@
 import csv
 import sys
 
+import pandas as pd
+from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -60,6 +62,7 @@ def load_data(filename):
     labels should be the corresponding list of labels, where each label
     is 1 if Revenue is true, and 0 otherwise.
     """
+    # Mapping dictionaries for conversion
     months = {
         'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'June': 5,
         'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
@@ -67,26 +70,19 @@ def load_data(filename):
     visitor_type = {
         'Returning_Visitor': 1, 'New_Visitor': 0, 'Other': 0
     }
-    bool_mapping = {'True': 1, 'False': 0}
+    bool_mapping = {True: 1, False: 0, 'True': 1, 'False': 0}
 
-    evidence = []
-    labels = []
+    # Load data from csv
+    csv_data = pd.read_csv(filename)
 
-    with open(filename, newline='') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            # Replace month and visitor type with their corresponding numeric values
-            row['Month'] = months[row['Month']]
-            row['VisitorType'] = visitor_type[row['VisitorType']]
-            row['Weekend'] = bool_mapping[row['Weekend']]
+    # Replace month names and boolean strings with numerical values in one go
+    csv_data.replace({'Month': months, 'VisitorType': visitor_type, 'Weekend': bool_mapping}, inplace=True)
 
-            # Convert Revenue to boolean and add to labels list
-            labels.append(1 if row['Revenue'] == 'True' else 0)
+    # Prepare labels by applying boolean mapping
+    labels = csv_data['Revenue'].map(bool_mapping).tolist()
 
-            # Remove Revenue from row and convert all remaining items to correct data types
-            del row['Revenue']
-            evidence.append([int(row[key]) if key != 'Month' and key != 'VisitorType' and key != 'Weekend' else row[key]
-                             for key in row])
+    # Drop 'Revenue' column to prepare evidence
+    evidence = csv_data.drop(columns=['Revenue']).values.tolist()
 
     return evidence, labels
 
@@ -116,14 +112,19 @@ def evaluate(labels, predictions):
     representing the "true negative rate": the proportion of
     actual negative labels that were accurately identified.
     """
-    # Calculate sensitivity (True Positive Rate)
-    sensitivity = tp / (tp + fn) if (tp + fn) != 0 else 0
+    tn, fp, fn, tp = confusion_matrix(labels, predictions).ravel()
 
-    # Calculate specificity (True Negative Rate)
-    specificity = tn / (tn + fp) if (tn + fp) != 0 else 0
+    if tp + fn != 0:
+        sensitivity = tp / (tp + fn)
+    else:
+        sensitivity = 0
+
+    if tn + fp != 0:
+        specificity = tn / (tn + fp)
+    else:
+        specificity = 0
 
     return sensitivity, specificity
-
 
 if __name__ == "__main__":
     main()
