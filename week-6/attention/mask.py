@@ -1,5 +1,6 @@
 import sys
 import tensorflow as tf
+from tensorflow.keras.models import Model
 
 from PIL import Image, ImageDraw, ImageFont
 from transformers import AutoTokenizer, TFBertForMaskedLM
@@ -45,8 +46,14 @@ def get_mask_token_index(mask_token_id, inputs):
     Return the index of the token with the specified `mask_token_id`, or
     `None` if not present in the `inputs`.
     """
-    # TODO: Implement this function
-    raise NotImplementedError
+    # Convert the IDs to a list to work with
+    input_ids = inputs['input_ids'].numpy().flatten()
+
+    # Find the index of the mask token ID
+    mask_indices = [i for i, token_id in enumerate(input_ids) if token_id == mask_token_id]
+
+    # Return the first occurrence of the mask token ID or None if not found
+    return mask_indices[0] if mask_indices else None
 
 
 
@@ -55,9 +62,8 @@ def get_color_for_attention_score(attention_score):
     Return a tuple of three integers representing a shade of gray for the
     given `attention_score`. Each value should be in the range [0, 255].
     """
-    # TODO: Implement this function
-    raise NotImplementedError
-
+    shade = int((1 - attention_score) * 255)
+    return (shade, shade, shade)
 
 
 def visualize_attentions(tokens, attentions):
