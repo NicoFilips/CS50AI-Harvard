@@ -125,7 +125,7 @@ class NimAI():
         old_q = self.q.get(state_action_pair, 0)
     
         # Calculate the new Q-value using the Q-learning update rule
-        new_q = old_q + self.alpha * ((reward + self.gamma * future_rewards) - old_q)
+        new_q = old_q + self.alpha * ((reward + future_rewards) - old_q)
     
         # Update the Q-value in the dictionary
         self.q[state_action_pair] = new_q
@@ -174,8 +174,8 @@ class NimAI():
         
         # Epsilon-greedy choice
         if epsilon > 0 and random.random() < epsilon:
-            return random.choice(available_moves)  # Directly use available_moves without conversion
-        return best_action if best_action is not None else random.choice(available_moves)
+            return random.choice(list(available_moves))  # Ensure available_moves is a list before passing to random.choice
+        return best_action if best_action is not None else random.choice(list(available_moves))
 
 
 def train(n):
